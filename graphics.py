@@ -1,66 +1,7 @@
-# graphics.py
-"""Simple object oriented graphics library  
-
-The library is designed to make it very easy for novice programmers to
-experiment with computer graphics in an object oriented fashion. It is
-written by John Zelle for use with the book "Python Programming: An
-Introduction to Computer Science" (Franklin, Beedle & Associates).
-
-LICENSE: This is open-source software released under the terms of the
-GPL (http://www.gnu.org/licenses/gpl.html).
-
-PLATFORMS: The package is a wrapper around Tkinter and should run on
-any platform where Tkinter is available.
-
-INSTALLATION: Put this file somewhere where Python can see it.
-
-OVERVIEW: There are two kinds of objects in the library. The GraphWin
-class implements a window where drawing can be done and various
-GraphicsObjects are provided that can be drawn into a GraphWin. As a
-simple example, here is a complete program to draw a circle of radius
-10 centered in a 100x100 window:
-
---------------------------------------------------------------------
-from graphics import *
-
-def main():
-    win = GraphWin("My Circle", 100, 100)
-    c = Circle(Point(50,50), 10)
-    c.draw(win)
-    win.getMouse() # Pause to view result
-    win.close()    # Close window when done
-
-main()
---------------------------------------------------------------------
-GraphWin objects support coordinate transformation through the
-setCoords method and mouse and keyboard interaction methods.
-
-The library provides the following graphical objects:
-    Point
-    Line
-    Circle
-    Oval
-    Rectangle
-    Polygon
-    Text
-    Entry (for text-based input)
-    Image
-
-Various attributes of graphical objects can be set such as
-outline-color, fill-color and line-width. Graphical objects also
-support moving and hiding for animation effects.
-
-The library also provides a very simple class for pixel-based image
-manipulation, Pixmap. A pixmap can be loaded from a file and displayed
-using an Image object. Both getPixel and setPixel methods are provided
-for manipulating the image.
-
-DOCUMENTATION: For complete documentation, see Chapter 4 of "Python
-Programming: An Introduction to Computer Science" by John Zelle,
-published by Franklin, Beedle & Associates.  Also see
-http://mcsp.wartburg.edu/zelle/python for a quick reference"""
-
 __version__ = "5.0"
+
+
+# JOHN ZEELE'S
 
 # Version 5 8/26/2016
 #     * update at bottom to fix MacOS issue causing askopenfile() to hang
@@ -222,7 +163,11 @@ class GraphWin(tk.Canvas):
         self.mouseX = None
         self.mouseY = None
         self.bind("<Button-1>", self._onClick)
-        self.bind_all("<Key>", self._onKey)
+        # Outdated, switched to key press and release
+        # self.bind_all("<Key>", self._onKey)
+        self.bind_all("<KeyPress>", self._pressKey)
+        self.bind_all("<KeyRelease>", self._releaseKey)
+        self.keyState=6*[0]
         self.height = int(height)
         self.width = int(width)
         self.autoflush = autoflush
@@ -251,6 +196,47 @@ class GraphWin(tk.Canvas):
     def _onKey(self, evnt):
         self.lastKey = evnt.keysym
 
+    def _pressKey(self,evnt):
+        #Quick method to identify keycodes
+        # print(evnt.keycode)
+        #A or left
+        if evnt.keycode == 65 or evnt.keycode == 97 or evnt.keycode == 37:
+           self.keyState[0] = 1 
+        #W or up
+        elif evnt.keycode == 87 or evnt.keycode == 119 or evnt.keycode == 38:
+           self.keyState[1] = 1
+        #D or right 
+        elif evnt.keycode == 68 or evnt.keycode == 100 or evnt.keycode == 39:
+           self.keyState[2] = 1
+        #S or down
+        elif evnt.keycode == 83 or evnt.keycode == 115 or evnt.keycode == 40:
+           self.keyState[3] = 1
+        #Space
+        elif evnt.keycode == 32:
+           self.keyState[4] = 1
+        #Escape
+        elif evnt.keycode == 27:
+           self.keyState[5] = 1
+
+    def _releaseKey(self,evnt):
+        #A or left
+        if evnt.keycode == 65 or evnt.keycode == 97 or evnt.keycode == 37:
+           self.keyState[0] = 0 
+        #W or up
+        elif evnt.keycode == 87 or evnt.keycode == 119 or evnt.keycode == 38:
+           self.keyState[1] = 0
+        #D or right 
+        elif evnt.keycode == 68 or evnt.keycode == 100 or evnt.keycode == 39:
+           self.keyState[2] = 0
+        #S or down
+        elif evnt.keycode == 83 or evnt.keycode == 115 or evnt.keycode == 40:
+           self.keyState[3] = 0
+        #Space
+        elif evnt.keycode == 32:
+           self.keyState[4] = 0
+        #Escape
+        elif evnt.keycode == 65307:
+           self.keyState[5] = 0
 
     def setBackground(self, color):
         """Set background color of the window"""
@@ -927,7 +913,6 @@ class Image(GraphicsObject):
     def getPixel(self, x, y):
         """Returns a list [r,g,b] with the RGB color values for pixel (x,y)
         r,g,b are in range(256)
-
         """
         
         value = self.img.get(x,y) 
@@ -948,7 +933,6 @@ class Image(GraphicsObject):
     def save(self, filename):
         """Saves the pixmap image to filename.
         The format for the save image is determined from the filname extension.
-
         """
         
         path, name = os.path.split(filename)

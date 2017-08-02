@@ -167,7 +167,7 @@ class GraphWin(tk.Canvas):
         # self.bind_all("<Key>", self._onKey)
         self.bind_all("<KeyPress>", self._pressKey)
         self.bind_all("<KeyRelease>", self._releaseKey)
-        self.keyState=6*[0]
+        self.keyState=10*[0]
         self.height = int(height)
         self.width = int(width)
         self.autoflush = autoflush
@@ -198,7 +198,7 @@ class GraphWin(tk.Canvas):
 
     def _pressKey(self,evnt):
         #Quick method to identify keycodes
-        # print(evnt.keycode)
+        print(evnt.keycode)
         #A or left
         if evnt.keycode == 65 or evnt.keycode == 97 or evnt.keycode == 37:
            self.keyState[0] = 1 
@@ -217,6 +217,18 @@ class GraphWin(tk.Canvas):
         #Escape
         elif evnt.keycode == 27:
            self.keyState[5] = 1
+        #1
+        elif evnt.keycode == 49:
+           self.keyState[6] = 1
+        #2
+        elif evnt.keycode == 50:
+           self.keyState[7] = 1
+        #3
+        elif evnt.keycode == 51:
+           self.keyState[8] = 1
+        #4
+        elif evnt.keycode == 52:
+           self.keyState[9] = 1
 
     def _releaseKey(self,evnt):
         #A or left
@@ -237,6 +249,18 @@ class GraphWin(tk.Canvas):
         #Escape
         elif evnt.keycode == 65307:
            self.keyState[5] = 0
+        #1
+        elif evnt.keycode == 49:
+           self.keyState[6] = 0
+        #2
+        elif evnt.keycode == 50:
+           self.keyState[7] = 0
+        #3
+        elif evnt.keycode == 51:
+           self.keyState[8] = 0
+        #4
+        elif evnt.keycode == 52:
+           self.keyState[9] = 0
 
     def setBackground(self, color):
         """Set background color of the window"""

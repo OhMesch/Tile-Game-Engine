@@ -3,40 +3,74 @@ from time import sleep
 print("Import Success")
 
 def capVelocity(velArr):
-    for i in range(len(velArr)):
-        if velArr[i] > 8:
-            velArr[i] = 8
-        elif velArr[i] < -8:
-            velArr[i] = -8
+    if velArr[0] > 8:
+        velArr[0] = 8
+    if velArr[0] < -8:
+        velArr[0] = -8
+    if velArr[1] > 8:
+        velArr[1] = 8
+    if velArr[1] < -12:
+        velArr[1] = -12
+    print(velArr)
 
 def checkBounds(player,terr,velArr):
     x = player.getCenter().getX()
     y = player.getCenter().getY()
+    counter = 4*[0]
 
-    #Determine if touching a block, if it is set its position and velocity appropriately 
-    if terr[int(y/20)][int((x+10)/20)-1] != 0:
-        velArr[0] = 0
-        player.move(10-(x%20),0)
+    #Check left and right
+    while terr[int(y/20)][int((x+velArr[0]-10)/20)] != 0 and counter[0] < 10 and velArr[0] < 0:
+        counter[0] +=1
+        velArr[0] /= 2
+    while terr[int(y/20)][int((x+velArr[0]+10)/20)] != 0 and counter[1] < 10 and velArr[0] > 0:
+        counter[1] +=1
+        velArr[0] /= 2
 
-    if terr[int((y+10)/20 - 1)][int(x/20)] != 0:
-        velArr[1] = 0
-        player.move(0,10-(y%20))
+    #Check up and down
+    while terr[int((y+velArr[1]-10)/20)][int(x/20)] != 0 and counter[2] < 10 and velArr[1] < 0:
+        counter[2] +=1
+        velArr[1] /=2
+    while terr[int((y+velArr[1]+10)/20)][int(x/20)] != 0 and counter[3] < 10 and velArr[1] > 0:
+        counter[3] +=1
+        velArr[1] /=2
 
-    if terr[int(y/20)][int((x-10)/20)+1] != 0:
-        velArr[0] = 0
-        player.move(-((x-10)%20),0)
 
-    if terr[int((y+10)/20)][int(x/20)] != 0:
-        velArr[1] = 0
-        player.move(0,-((y+10)%20))
+# def checkBounds(player,terr,velArr):
+#     x = player.getCenter().getX()
+#     y = player.getCenter().getY()
+
+#     #Determine if touching a block, if it is set its position and velocity appropriately 
+#     #Left Block
+#     if terr[int(y/20)][int((x+10)/20)-1] != 0:
+#         if velArr[0] < 0:
+#             velArr[0] = 0
+#         player.move(10-(x%20),0)
+
+#     #Block above
+#     if terr[int((y+10)/20 - 1)][int(x/20)] != 0:
+#         if velArr[1] < 0:
+#             velArr[1] = 0
+#         player.move(0,10-(y%20))
+
+#     #Right block
+#     if terr[int(y/20)][int((x-10)/20)+1] != 0:
+#         if velArr[0] > 0:
+#             velArr[0] = 0
+#         player.move(-((x-10)%20),0)
+
+#     #Block below
+#     if terr[int((y+10)/20)][int(x/20)] != 0:
+#         if velArr[1] > 0:
+#             velArr[1] = 0
+#         player.move(0,-((y+10)%20))
 
 def createBlock(blockCenter,blockType,window,terr):
     newX = blockCenter.getX() - (blockCenter.getX()%20)
     newY = blockCenter.getY() - (blockCenter.getY()%20)
     p1 = Point(newX,newY)
     p2 = Point(newX+20,newY+20)
-    print('Clicked',blockCenter.getX(),blockCenter.getY())
-    print('point',newX,newY)
+    # print('Clicked',blockCenter.getX(),blockCenter.getY())
+    # print('point',newX,newY)
     newBlock = Rectangle(p1,p2)
     if blockType == 1:
         terr[int(newY/20)][int(newX/20)] = 1
@@ -63,21 +97,29 @@ def generateLevelEditor():
         verLines.draw(window)
     return(window)
 
-def isFalling(x,y,terr):
-    return(terr[int((y-10)/20 + 1)][int(x/20)] == 0)
+def isFalling(fallingObject,terr):
+    x = fallingObject.getCenter().getX()
+    y = fallingObject.getCenter().getY()
+    return(terr[int((y-8)/20 + 1)][int(x/20)] == 0)
 
-def loseVel(velArr):
-    for i in range(len(velArr)):
-        if velArr[i] > 0:
-            velArr[i] -= .1
-        if velArr[i] < 0:
-            velArr [i] += .1
-        if abs(velArr[i]) < .1:
-            velArr[i] = 0
+def loseVel(velArr,key):
+    if velArr[0] > 0 and key[2] != 1:
+        velArr[0] *= .9
 
-def updateMove(moveObj,vel):
-    moveObj.move(vel[0],0)
-    moveObj.move(0,vel[1])
+    elif velArr[0] < 0 and key[0] != 1:
+        velArr[0] *= .9
+
+    if abs(velArr[1]) < 0:
+        velArr[1] *= .95
+
+    if abs(velArr[0]) < .05:
+        velArr[0] = 0
+    if abs(velArr[1]) < .05:
+        velArr[1] = 0
+
+def updateMove(moveObj,velArr):
+    moveObj.move(velArr[0],0)
+    moveObj.move(0,velArr[1])
 
 def main():
     terrain = [[0 for x in range(25)] for y in range(25)]
@@ -134,29 +176,26 @@ def main():
         # print(editor.keyState)
         px = player.getCenter().getX()
         py = player.getCenter().getY()
-        print('position:',px,py)
+        # print('position:',px,py)
 
-        if isFalling(px,py,terrain):
+        if isFalling(player,terrain):
             velocity[1] += 1
-
-        capVelocity(velocity)
-        checkBounds(player,terrain,velocity)
 
         if editor.keyState[0] and terrain[int(py/20)][int((px+5)/20)-1] == 0:
             velocity[0] -= .5
-            # player.move(-velocity[0],0)
-        if editor.keyState[1] and terrain[int((py+5)/20 - 1)][int(px/20)] == 0 and not isFalling(px,py,terrain):
-            velocity[1] = -8
-            # player.move(0,-velocity[1])
+        if editor.keyState[1] and terrain[int((py+5)/20 - 1)][int(px/20)] == 0 and not isFalling(player,terrain):
+            velocity[1] = -10
         if editor.keyState[2] and terrain[int(py/20)][int((px-10)/20)+1] == 0:
             velocity[0] += .5
-            # player.move(velocity[0],0)
-        
+
+        capVelocity(velocity)
+        checkBounds(player,terrain,velocity)
         updateMove(player,velocity)
-        loseVel(velocity)
+        loseVel(velocity,editor.keyState)
         # print('Vel:', velocity)
         editor.update()
-        sleep(0.02) #make this a float, beware bugs
+        sleep(0.02)
+
     editor.close()
     for line in terrain:
         print(line)

@@ -247,7 +247,7 @@ class GraphWin(tk.Canvas):
         elif evnt.keycode == 32:
            self.keyState[4] = 0
         #Escape
-        elif evnt.keycode == 65307:
+        elif evnt.keycode == 27:
            self.keyState[5] = 0
         #1
         elif evnt.keycode == 49:

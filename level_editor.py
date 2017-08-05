@@ -2,6 +2,20 @@ from graphics import *
 from time import sleep
 print("Import Success")
 
+class Menu():
+    def __init__(self,window):
+        self.window = window
+        self.menu = Rectangle(Point(.15*500,.15*500),Point(.85*500,.85*500))
+        skyBlue = color_rgb(135,206,250)
+        self.menu.setFill(skyBlue)
+        self.menu.setOutline(skyBlue)
+
+    def openMenu(self):
+        self.menu.draw(self.window)
+
+    def closeMenu(self):
+        self.menu.undraw()
+
 def capVelocity(velArr):
     if velArr[0] > 8:
         velArr[0] = 8
@@ -11,7 +25,7 @@ def capVelocity(velArr):
         velArr[1] = 8
     if velArr[1] < -12:
         velArr[1] = -12
-    print(velArr)
+    # print(velArr)
 
 def checkBounds(player,terr,velArr):
     x = player.getCenter().getX()
@@ -171,28 +185,37 @@ def main():
     velocity = 2*[0]
     # print("Vel:", velocity)
 
-    while(not editor.keyState[5]):
-        lastKey = editor.checkKey()
+    menuOpen = False
+    menu = Menu(editor)
+    while(True):
         # print(editor.keyState)
         px = player.getCenter().getX()
         py = player.getCenter().getY()
         # print('position:',px,py)
+        if menuOpen and editor.keyState[5]:
+            menu.closeMenu()
+            menuOpen = False
+            sleep(.05)
+        elif not menuOpen and editor.keyState[5]:
+            menu.openMenu()
+            menuOpen = True
+            sleep(.05)
+        if not menuOpen:
+            if isFalling(player,terrain):
+                velocity[1] += 1
 
-        if isFalling(player,terrain):
-            velocity[1] += 1
+            if editor.keyState[0] and terrain[int(py/20)][int((px+5)/20)-1] == 0:
+                velocity[0] -= .5
+            if editor.keyState[1] and terrain[int((py+5)/20 - 1)][int(px/20)] == 0 and not isFalling(player,terrain):
+                velocity[1] = -10
+            if editor.keyState[2] and terrain[int(py/20)][int((px-10)/20)+1] == 0:
+                velocity[0] += .5
 
-        if editor.keyState[0] and terrain[int(py/20)][int((px+5)/20)-1] == 0:
-            velocity[0] -= .5
-        if editor.keyState[1] and terrain[int((py+5)/20 - 1)][int(px/20)] == 0 and not isFalling(player,terrain):
-            velocity[1] = -10
-        if editor.keyState[2] and terrain[int(py/20)][int((px-10)/20)+1] == 0:
-            velocity[0] += .5
-
-        capVelocity(velocity)
-        checkBounds(player,terrain,velocity)
-        updateMove(player,velocity)
-        loseVel(velocity,editor.keyState)
-        # print('Vel:', velocity)
+            capVelocity(velocity)
+            checkBounds(player,terrain,velocity)
+            updateMove(player,velocity)
+            loseVel(velocity,editor.keyState)
+            # print('Vel:', velocity)
         editor.update()
         sleep(0.02)
 

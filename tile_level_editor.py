@@ -1,20 +1,6 @@
-from graphics import *
 from time import sleep
-print("Import Success")
+import tile_terrain
 
-class Menu():
-    def __init__(self,window):
-        self.window = window
-        self.menu = Rectangle(Point(.15*500,.15*500),Point(.85*500,.85*500))
-        skyBlue = color_rgb(135,206,250)
-        self.menu.setFill(skyBlue)
-        self.menu.setOutline(skyBlue)
-
-    def openMenu(self):
-        self.menu.draw(self.window)
-
-    def closeMenu(self):
-        self.menu.undraw()
 
 def capVelocity(velArr):
     if velArr[0] > 8:
@@ -25,7 +11,7 @@ def capVelocity(velArr):
         velArr[1] = 8
     if velArr[1] < -12:
         velArr[1] = -12
-    # print(velArr)
+
 
 def checkBounds(player,terr,velArr):
     x = player.getCenter().getX()
@@ -78,43 +64,12 @@ def checkBounds(player,terr,velArr):
 #             velArr[1] = 0
 #         player.move(0,-((y+10)%20))
 
-def createBlock(blockCenter,blockType,window,terr):
-    newX = blockCenter.getX() - (blockCenter.getX()%20)
-    newY = blockCenter.getY() - (blockCenter.getY()%20)
-    p1 = Point(newX,newY)
-    p2 = Point(newX+20,newY+20)
-    # print('Clicked',blockCenter.getX(),blockCenter.getY())
-    # print('point',newX,newY)
-    newBlock = Rectangle(p1,p2)
-    if blockType == 1:
-        terr[int(newY/20)][int(newX/20)] = 1
-        newBlock.setFill('red')
-    elif blockType == 2:
-        terr[int(newY/20)][int(newX/20)] = 2
-        newBlock.setFill('blue')
-    elif blockType == 3:
-        terr[int(newY/20)][int(newX/20)] = 3
-        newBlock.setFill('yellow')
-    else:
-        terr[int(newY/20)][int(newX/20)] = 4
-        newBlock.setFill('green')
-    newBlock.draw(window)
-
-def generateLevelEditor():
-    window = GraphWin("Level Editor",500,500)
-    for i in range(0,500,20): #Determines size of terrain
-        horLines = Line(Point(0,i),Point(500,i))
-        horLines.setOutline('grey')
-        horLines.draw(window)
-        verLines = Line(Point(i,0),Point(i,500))
-        verLines.setOutline('grey')
-        verLines.draw(window)
-    return(window)
 
 def isFalling(fallingObject,terr):
     x = fallingObject.getCenter().getX()
     y = fallingObject.getCenter().getY()
     return(terr[int((y-8)/20 + 1)][int(x/20)] == 0)
+
 
 def loseVel(velArr,key):
     if velArr[0] > 0 and key[2] != 1:
@@ -131,50 +86,60 @@ def loseVel(velArr,key):
     if abs(velArr[1]) < .05:
         velArr[1] = 0
 
+
 def updateMove(moveObj,velArr):
     moveObj.move(velArr[0],0)
     moveObj.move(0,velArr[1])
 
-def main():
-    terrain = [[0 for x in range(25)] for y in range(25)]
-    # print(terrain)
 
-    editor = generateLevelEditor()
+def update_last_number_keystate(key_states, d):
+    for key in d.keys():
+        if key == 'last':
+            continue
+        if key_states[key] == 1:
+            d[d['last']] = 0
+            d[key] = 1
+            d['last'] = key
+            return
 
+
+def get_last_number_keystate(d):
+    for key in d.keys():
+        if key == 'last':
+            continue
+        if d[key] == 1:
+            return int(key)
+
+
+def loop(ren, window_width, window_height, block_size):
     blockPoint = None
-    prevStateOne = None
-    prevStateTwo = None
-    prevStateThree = None
-    prevStateFour = None
-    lastKey = None
-    
-    while(not editor.keyState[5]):
-        #Records what block type to place next
-        if editor.keyState[6] == 1 and prevStateOne ==0:
-            lastKey = 1
-        if editor.keyState[7] == 1 and prevStateTwo ==0:
-            lastKey = 2
-        if editor.keyState[8] == 1 and prevStateThree ==0:
-            lastKey = 3
-        if editor.keyState[9] == 1 and prevStateFour ==0:
-            lastKey = 4
+    d = {'last': '1', '1': 1, '2': 0, '3': 0, '4': 0}
 
-        prevStateOne = editor.keyState[6]
-        prevStateTwo = editor.keyState[7]
-        prevStateThree = editor.keyState[8]
-        prevStateFour = editor.keyState[9]
+    width = window_width // block_size
+    height = window_height // block_size
+    terrain = tile_terrain.Terrain(width, height)
+    ren.draw_grid()
 
-        # print(editor.keyState)
-        if not blockPoint:
-            blockPoint = editor.checkMouse()
-            # print('PlaceBlock')
-        else:
-            createBlock(blockPoint,lastKey,editor,terrain)
+    while(True):
+        ren.update()
+        key_states = ren.get_all_keystates()
+
+        if key_states['q'] == 1:
+            return 'q'
+
+        update_last_number_keystate(key_states, d)
+        lastNumber = get_last_number_keystate(d)
+
+        mouse_coords = ren.get_mouse_coords()
+
+        if mouse_coords != None:
+            terrain.createBlock(mouse_coords, lastNumber)
+            ren.render_block(terrain, mouse_coords)
             blockPoint = None
+        sleep(.05)
 
-        sleep(.02)
 
-    player = Rectangle(Point(250,250),Point(270,270))
+    player = Rectangle(Point(250,250), Point(270,270))
     player.setFill('Black')
     player.draw(editor)
 
@@ -222,4 +187,3 @@ def main():
     editor.close()
     for line in terrain:
         print(line)
-main()

@@ -1,2 +1,0 @@
-import graphics 
-print("Success")

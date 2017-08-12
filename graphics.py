@@ -163,11 +163,12 @@ class GraphWin(tk.Canvas):
         self.mouseX = None
         self.mouseY = None
         self.bind("<Button-1>", self._onClick)
+        self.bind("<B1-Motion>",self._mouseMove)
         # Outdated, switched to key press and release
         # self.bind_all("<Key>", self._onKey)
         self.bind_all("<KeyPress>", self._pressKey)
         self.bind_all("<KeyRelease>", self._releaseKey)
-        self.keyState=12*[0]
+        self.keyState=13*[0]
         self.height = int(height)
         self.width = int(width)
         self.autoflush = autoflush
@@ -233,8 +234,11 @@ class GraphWin(tk.Canvas):
         elif evnt.keycode == 53:
            self.keyState[10] = 1
         #q
-        elif evnt.keycode == 13:
+        elif evnt.keycode == 81:
            self.keyState[11] = 1
+        #Enter
+        elif evnt.keycode == 13:
+           self.keyState[12] = 1
 
     def _releaseKey(self,evnt):
         #A or left
@@ -273,6 +277,9 @@ class GraphWin(tk.Canvas):
         #q
         elif evnt.keycode == 81:
            self.keyState[11] = 0
+        #Enter
+        elif evnt.keycode == 13:
+           self.keyState[12] = 0
 
     def setBackground(self, color):
         """Set background color of the window"""
@@ -402,6 +409,10 @@ class GraphWin(tk.Canvas):
     def setMouseHandler(self, func):
         self._mouseCallback = func
         
+    def _mouseMove(self, e):
+        self.mouseX = e.x
+        self.mouseY = e.y
+
     def _onClick(self, e):
         self.mouseX = e.x
         self.mouseY = e.y

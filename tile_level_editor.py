@@ -1,5 +1,7 @@
 from time import sleep
+from graphics import *
 import tile_terrain
+import tile_renderer
 
 
 def capVelocity(velArr):
@@ -13,24 +15,24 @@ def capVelocity(velArr):
         velArr[1] = -12
 
 
-def checkBounds(player,terr,velArr):
+def checkBounds(player,terr,size,velArr):
     x = player.getCenter().getX()
     y = player.getCenter().getY()
     counter = 4*[0]
 
     #Check left and right
-    while terr[int(y/20)][int((x+velArr[0]-10)/20)] != 0 and counter[0] < 10 and velArr[0] < 0:
+    while terr[int(y/size)][int((x+velArr[0]-size/2)/size)] != 0 and counter[0] < 10 and velArr[0] < 0:
         counter[0] +=1
         velArr[0] /= 2
-    while terr[int(y/20)][int((x+velArr[0]+10)/20)] != 0 and counter[1] < 10 and velArr[0] > 0:
+    while terr[int(y/size)][int((x+velArr[0]+size/2)/size)] != 0 and counter[1] < 10 and velArr[0] > 0:
         counter[1] +=1
         velArr[0] /= 2
 
     #Check up and down
-    while terr[int((y+velArr[1]-10)/20)][int(x/20)] != 0 and counter[2] < 10 and velArr[1] < 0:
+    while terr[int((y+velArr[1]-size/2)/size)][int(x/size)] != 0 and counter[2] < 10 and velArr[1] < 0:
         counter[2] +=1
         velArr[1] /=2
-    while terr[int((y+velArr[1]+10)/20)][int(x/20)] != 0 and counter[3] < 10 and velArr[1] > 0:
+    while terr[int((y+velArr[1]+size/2)/size)][int(x/size)] != 0 and counter[3] < 10 and velArr[1] > 0:
         counter[3] +=1
         velArr[1] /=2
 
@@ -65,17 +67,17 @@ def checkBounds(player,terr,velArr):
 #         player.move(0,-((y+10)%20))
 
 
-def isFalling(fallingObject,terr):
+def isFalling(fallingObject,terr,size):
     x = fallingObject.getCenter().getX()
     y = fallingObject.getCenter().getY()
-    return(terr[int((y-8)/20 + 1)][int(x/20)] == 0)
+    return(terr[int((y-2/5*size)/size + 1)][int(x/size)] == 0)
 
 
 def loseVel(velArr,key):
-    if velArr[0] > 0 and key[2] != 1:
+    if velArr[0] > 0 and key['d'] != 1:
         velArr[0] *= .9
 
-    elif velArr[0] < 0 and key[0] != 1:
+    elif velArr[0] < 0 and key['a'] != 1:
         velArr[0] *= .9
 
     if abs(velArr[1]) < 0:
@@ -119,6 +121,7 @@ def loop(ren, window_width, window_height, block_size):
     height = window_height // block_size
     terrain = tile_terrain.Terrain(width, height)
     ren.draw_grid()
+    window=ren.get_window()
 
     while(True):
         ren.update()
@@ -126,6 +129,9 @@ def loop(ren, window_width, window_height, block_size):
 
         if key_states['q'] == 1:
             return 'q'
+
+        if key_states['enter'] == 1:
+            break
 
         update_last_number_keystate(key_states, d)
         lastNumber = get_last_number_keystate(d)
@@ -139,51 +145,53 @@ def loop(ren, window_width, window_height, block_size):
         sleep(.05)
 
 
-    player = Rectangle(Point(250,250), Point(270,270))
+    player = Rectangle(Point(250,250), Point(250+block_size,250+block_size))
     player.setFill('Black')
-    player.draw(editor)
+    player.draw(window)
 
     lastKey = None
     falling = False
-    editor.keyState[5] = 0
 
     velocity = 2*[0]
     # print("Vel:", velocity)
 
     menuOpen = False
-    menu = Menu(editor)
+    menu = tile_renderer.Menu(window)
     while(True):
         # print(editor.keyState)
         px = player.getCenter().getX()
         py = player.getCenter().getY()
         # print('position:',px,py)
-        if menuOpen and editor.keyState[5]:
+        if menuOpen and key_states['esc'] == 1:
             menu.closeMenu()
             menuOpen = False
-            sleep(.05)
-        elif not menuOpen and editor.keyState[5]:
+            sleep(.1)
+        elif not menuOpen and key_states['esc'] == 1:
             menu.openMenu()
             menuOpen = True
-            sleep(.05)
+            sleep(.1)
         if not menuOpen:
-            if isFalling(player,terrain):
+
+            if isFalling(player,terrain.get_map(),block_size):
                 velocity[1] += 1
 
-            if editor.keyState[0] and terrain[int(py/20)][int((px+5)/20)-1] == 0:
+            if key_states['a'] == 1 and terrain.get_map()[int(py/block_size)][int((px+block_size/4)/block_size)-1] == 0:
                 velocity[0] -= .5
-            if editor.keyState[1] and terrain[int((py+5)/20 - 1)][int(px/20)] == 0 and not isFalling(player,terrain):
+            if key_states['w'] == 1 and terrain.get_map()[int((py+block_size/4)/block_size - 1)][int(px/block_size)] == 0 and not isFalling(player,terrain.get_map(),block_size):
                 velocity[1] = -10
-            if editor.keyState[2] and terrain[int(py/20)][int((px-10)/20)+1] == 0:
+            if key_states['d'] == 1 and terrain.get_map()[int(py/block_size)][int((px-block_size/2)/block_size)+1] == 0:
                 velocity[0] += .5
 
             capVelocity(velocity)
-            checkBounds(player,terrain,velocity)
+            checkBounds(player,terrain.get_map(),block_size,velocity)
             updateMove(player,velocity)
-            loseVel(velocity,editor.keyState)
+            loseVel(velocity,key_states)
             # print('Vel:', velocity)
-        editor.update()
+        if key_states['q'] == 1:
+            break
+        ren.update()
         sleep(0.02)
 
-    editor.close()
-    for line in terrain:
+    window.close()
+    for line in terrain.get_map():
         print(line)

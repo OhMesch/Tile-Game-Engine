@@ -19,7 +19,8 @@ class Renderer():
         '3': 0,
         '4': 0,
         '5': 0,
-        'q': 0
+        'q': 0,
+        'enter': 0
         }
 
 
@@ -44,10 +45,10 @@ class Renderer():
 
 
     def update_keystates(self):
-        self.states['w'] = self.win.keyState[0]
-        self.states['a'] = self.win.keyState[1]
-        self.states['s'] = self.win.keyState[2]
-        self.states['d'] = self.win.keyState[3]
+        self.states['a'] = self.win.keyState[0]
+        self.states['w'] = self.win.keyState[1]
+        self.states['d'] = self.win.keyState[2]
+        self.states['s'] = self.win.keyState[3]
         self.states['space'] = self.win.keyState[4]
         self.states['esc'] = self.win.keyState[5]
         self.states['1'] = self.win.keyState[6]
@@ -56,6 +57,7 @@ class Renderer():
         self.states['4'] = self.win.keyState[9]
         self.states['5'] = self.win.keyState[10]
         self.states['q'] = self.win.keyState[11]
+        self.states['enter'] = self.win.keyState[12]
 
 
     def get_all_keystates(self):
@@ -95,6 +97,7 @@ class Renderer():
         else:
             newBlock.setFill('green')
         newBlock.draw(self.win)
+
 
 
 

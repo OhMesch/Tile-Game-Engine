@@ -15,62 +15,32 @@ def capVelocity(velArr):
         velArr[1] = -12
 
 
-def checkBounds(player,terr,size,velArr):
+def checkBounds(player,terr,size,velArr): #Right now u can skate over 1 cell gaps
     x = player.getCenter().getX()
     y = player.getCenter().getY()
     counter = 4*[0]
 
-    #Check left and right
+    #Check left
     while terr[int(y/size)][int((x+velArr[0]-size/2)/size)] != 0 and counter[0] < 10 and velArr[0] < 0:
         counter[0] +=1
         velArr[0] /= 2
-    while terr[int(y/size)][int((x+velArr[0]+size/2)/size)] != 0 and counter[1] < 10 and velArr[0] > 0:
+    #Check right
+    while (terr[int(y/size)][int((x+velArr[0]+size/2)/size)] != 0 or terr[int((y+size/2)/size)][int((x+velArr[0]+size/2)/size)] != 0 or terr[int((y-size/2)/size)][int((x+velArr[0]+size/2)/size)] != 0) and counter[1] < 10 and velArr[0] > 0:
         counter[1] +=1
         velArr[0] /= 2
-
-    #Check up and down
+    #Check up
     while terr[int((y+velArr[1]-size/2)/size)][int(x/size)] != 0 and counter[2] < 10 and velArr[1] < 0:
         counter[2] +=1
         velArr[1] /=2
-    while terr[int((y+velArr[1]+size/2)/size)][int(x/size)] != 0 and counter[3] < 10 and velArr[1] > 0:
+    # Check down
+    while (terr[int((y+velArr[1]+size/2)/size)][int(x/size)] != 0 or terr[int((y+velArr[1]+size/2)/size)][int((x+size/2)/size)] != 0 or terr[int((y+velArr[1]+size/2)/size)][int((x-size/2)/size)] != 0) and counter[3] < 10 and velArr[1] > 0:
         counter[3] +=1
         velArr[1] /=2
-
-
-# def checkBounds(player,terr,velArr):
-#     x = player.getCenter().getX()
-#     y = player.getCenter().getY()
-
-#     #Determine if touching a block, if it is set its position and velocity appropriately 
-#     #Left Block
-#     if terr[int(y/20)][int((x+10)/20)-1] != 0:
-#         if velArr[0] < 0:
-#             velArr[0] = 0
-#         player.move(10-(x%20),0)
-
-#     #Block above
-#     if terr[int((y+10)/20 - 1)][int(x/20)] != 0:
-#         if velArr[1] < 0:
-#             velArr[1] = 0
-#         player.move(0,10-(y%20))
-
-#     #Right block
-#     if terr[int(y/20)][int((x-10)/20)+1] != 0:
-#         if velArr[0] > 0:
-#             velArr[0] = 0
-#         player.move(-((x-10)%20),0)
-
-#     #Block below
-#     if terr[int((y+10)/20)][int(x/20)] != 0:
-#         if velArr[1] > 0:
-#             velArr[1] = 0
-#         player.move(0,-((y+10)%20))
-
 
 def isFalling(fallingObject,terr,size):
     x = fallingObject.getCenter().getX()
     y = fallingObject.getCenter().getY()
-    return(terr[int((y-2/5*size)/size + 1)][int(x/size)] == 0)
+    return(not(terr[int((y-2/5*size)/size + 1)][int(x/size)] == 1 or terr[int((y-2/5*size)/size + 1)][int((x-size/2)/size)] == 1 or terr[int((y-2/5*size)/size + 1)][int((x+size/2)/size)] == 1))
 
 
 def loseVel(velArr,key):
@@ -187,8 +157,32 @@ def loop(ren, window_width, window_height, block_size):
             updateMove(player,velocity)
             loseVel(velocity,key_states)
             # print('Vel:', velocity)
+
+        else:
+            menuMouse = window.checkMouse()
+
+            if menuMouse:
+                menuMouseX = menuMouse.getX()
+                menuMouseY = menuMouse.getY()
+
+                #Make a function for each?
+                #We have access to window width and height
+
+                #checkSave
+                if 0.25*500 <= menuMouseX <= 0.75*500 and 0.2*500 <= menuMouseY <= 0.35*500:
+                    print('saved')
+                
+                #checkLoad
+                if 0.25*500 <= menuMouseX <= 0.75*500 and 0.4*500 <= menuMouseY <= .55*500:
+                    print('load')
+
+                #checkQuit
+                if 0.25*500 <= menuMouseX <= 0.75*500 and 0.6*500 <= menuMouseY <= 0.75*500:
+                    return('q')
+
         if key_states['q'] == 1:
-            break
+            print('ConvetionalExit')
+            return('q')
         ren.update()
         sleep(0.02)
 

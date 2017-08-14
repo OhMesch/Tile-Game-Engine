@@ -101,7 +101,7 @@ class Renderer():
 
 
 
-class Menu():
+class Menu(): #CHANGE TO SELF. WIDTH AND HIEGHT
     def __init__(self,window):
         self.window = window
 

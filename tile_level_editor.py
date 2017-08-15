@@ -21,21 +21,21 @@ def checkBounds(player,terr,size,velArr): #Right now u can skate over 1 cell gap
     counter = 4*[0]
 
     #Check left
-    while terr[int(y/size)][int((x+velArr[0]-size/2)/size)] != 0 and counter[0] < 10 and velArr[0] < 0:
+    while (terr[int(y/size)][int((x+velArr[0]-size/2)/size)] != 0 or terr[int((y+size/2)/size)][int((x+velArr[0]-size/2)/size)] != 0 or terr[int((y-size/2)/size)][int((x+velArr[0]-size/2)/size)] != 0) and counter[0] < 20 and velArr[0] < 0:
         counter[0] +=1
-        velArr[0] /= 2
+        velArr[0] /= 3
     #Check right
-    while (terr[int(y/size)][int((x+velArr[0]+size/2)/size)] != 0 or terr[int((y+size/2)/size)][int((x+velArr[0]+size/2)/size)] != 0 or terr[int((y-size/2)/size)][int((x+velArr[0]+size/2)/size)] != 0) and counter[1] < 10 and velArr[0] > 0:
+    while (terr[int(y/size)][int((x+velArr[0]+size/2)/size)] != 0 or terr[int((y+size/2)/size)][int((x+velArr[0]+size/2)/size)] != 0 or terr[int((y-size/2)/size)][int((x+velArr[0]+size/2)/size)] != 0) and counter[1] < 20 and velArr[0] > 0:
         counter[1] +=1
-        velArr[0] /= 2
+        velArr[0] /= 3
     #Check up
-    while terr[int((y+velArr[1]-size/2)/size)][int(x/size)] != 0 and counter[2] < 10 and velArr[1] < 0:
+    while (terr[int((y+velArr[1]-size/2)/size)][int(x/size)] != 0 or terr[int((y+velArr[1]-size/2)/size)][int((x+size/2)/size)] != 0 or terr[int((y+velArr[1]-size/2)/size)][int((x-size/2)/size)] != 0) and counter[2] < 20 and velArr[1] < 0:
         counter[2] +=1
-        velArr[1] /=2
+        velArr[1] /=3
     # Check down
-    while (terr[int((y+velArr[1]+size/2)/size)][int(x/size)] != 0 or terr[int((y+velArr[1]+size/2)/size)][int((x+size/2)/size)] != 0 or terr[int((y+velArr[1]+size/2)/size)][int((x-size/2)/size)] != 0) and counter[3] < 10 and velArr[1] > 0:
+    while (terr[int((y+velArr[1]+size/2)/size)][int(x/size)] != 0 or terr[int((y+velArr[1]+size/2)/size)][int((x+size/2)/size)] != 0 or terr[int((y+velArr[1]+size/2)/size)][int((x-size/2)/size)] != 0) and counter[3] < 20 and velArr[1] > 0:
         counter[3] +=1
-        velArr[1] /=2
+        velArr[1] /=3
 
 def isFalling(fallingObject,terr,size):
     x = fallingObject.getCenter().getX()

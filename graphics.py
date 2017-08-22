@@ -164,6 +164,7 @@ class GraphWin(tk.Canvas):
         self.mouseY = None
         self.bind("<Button-1>", self._onClick)
         self.bind("<B1-Motion>",self._mouseMove)
+        self.bind("<B3-Motion>", self._rightClick)
         # Outdated, switched to key press and release
         # self.bind_all("<Key>", self._onKey)
         self.bind_all("<KeyPress>", self._pressKey)
@@ -419,6 +420,8 @@ class GraphWin(tk.Canvas):
         if self._mouseCallback:
             self._mouseCallback(Point(e.x, e.y))
 
+    def _rightClick(self,e):
+        print("delBlock")
     def addItem(self, item):
         self.items.append(item)
 

@@ -89,13 +89,13 @@ class Renderer():
         blockType = terrain.get_map()[y][x]
 
         if blockType == 1:
-            newBlock.setFill('red')
+            newBlock.setFill('green')
         elif blockType == 2:
             newBlock.setFill('blue')
         elif blockType == 3:
             newBlock.setFill('yellow')
         else:
-            newBlock.setFill('green')
+            newBlock.setFill('red')
         newBlock.draw(self.win)
 
 
@@ -120,6 +120,24 @@ class Menu(): #CHANGE TO SELF. WIDTH AND HIEGHT
         self.saveTxt.setSize(30)
         self.saveTxt.setFace("helvetica")
         self.saveTxt.setStyle("bold")
+
+        self.saveAs = Rectangle(Point(.25*500,.4*500),Point(.75*500,.55*500))
+        self.saveAs.setOutline(royalBlue)
+        self.saveAs.setFill(royalBlue)
+
+        self.saveAsTxt = Text(Point(.50*500,.475*500), "SAVE AS")
+        self.saveAsTxt.setSize(30)
+        self.saveAsTxt.setFace("helvetica")
+        self.saveAsTxt.setStyle("bold")
+
+        self.back = Rectangle(Point(.25*500,.6*500),Point(.75*500,.75*500))
+        self.back.setOutline(royalBlue)
+        self.back.setFill(royalBlue)
+
+        self.backTxt = Text(Point(.50*500,.675*500), "BACK")
+        self.backTxt.setSize(30)
+        self.backTxt.setFace("helvetica")
+        self.backTxt.setStyle("bold")
 
         self.load = Rectangle(Point(.25*500,.4*500),Point(.75*500,.55*500))
         self.load.setOutline(royalBlue)
@@ -148,6 +166,14 @@ class Menu(): #CHANGE TO SELF. WIDTH AND HIEGHT
         self.quit.draw(self.window)
         self.quitTxt.draw(self.window)
 
+    def saveMenu(self):
+        self.closeMenu()
+        self.menu.draw(self.window)
+        self.saveAs.draw(self.window)
+        self.saveAsTxt.draw(self.window)
+        self.back.draw(self.window)
+        self.backTxt.draw(self.window)
+
     def closeMenu(self):
         self.menu.undraw()
         self.save.undraw()
@@ -156,3 +182,11 @@ class Menu(): #CHANGE TO SELF. WIDTH AND HIEGHT
         self.loadTxt.undraw()
         self.quit.undraw()
         self.quitTxt.undraw()
+
+    def closeSave(self):
+        self.menu.undraw()
+        self.saveAs.undraw()
+        self.saveAsTxt.undraw()
+        self.back.undraw()
+        self.backTxt.undraw()
+        self.openMenu()

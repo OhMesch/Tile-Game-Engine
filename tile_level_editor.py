@@ -126,6 +126,7 @@ def loop(ren, window_width, window_height, block_size):
     # print("Vel:", velocity)
 
     menuOpen = False
+    saveMenuOpen = False
     menu = tile_renderer.Menu(window)
     while(True):
         # print(editor.keyState)
@@ -140,7 +141,7 @@ def loop(ren, window_width, window_height, block_size):
             menu.openMenu()
             menuOpen = True
             sleep(.1)
-        if not menuOpen:
+        if not menuOpen and not saveMenuOpen:
 
             if isFalling(player,terrain.get_map(),block_size):
                 velocity[1] += 1
@@ -158,27 +159,44 @@ def loop(ren, window_width, window_height, block_size):
             loseVel(velocity,key_states)
             # print('Vel:', velocity)
 
-        else:
+        if menuOpen or saveMenuOpen:
             menuMouse = window.checkMouse()
-
             if menuMouse:
                 menuMouseX = menuMouse.getX()
                 menuMouseY = menuMouse.getY()
+                print(menuMouseX,menuMouseY)
 
                 #Make a function for each?
                 #We have access to window width and height
 
-                #checkSave
-                if 0.25*500 <= menuMouseX <= 0.75*500 and 0.2*500 <= menuMouseY <= 0.35*500:
-                    print('saved')
-                
-                #checkLoad
-                if 0.25*500 <= menuMouseX <= 0.75*500 and 0.4*500 <= menuMouseY <= .55*500:
-                    print('load')
+                if menuOpen:
+                    #checkSave
+                    if 0.25*500 <= menuMouseX <= 0.75*500 and 0.2*500 <= menuMouseY <= 0.35*500:
+                        print('saved')
+                        menu.saveMenu()
+                        saveMenuOpen = True
+                        menuOpen = False
+                    
+                    #checkLoad
+                    if 0.25*500 <= menuMouseX <= 0.75*500 and 0.4*500 <= menuMouseY <= .55*500:
+                        print('load')
 
-                #checkQuit
-                if 0.25*500 <= menuMouseX <= 0.75*500 and 0.6*500 <= menuMouseY <= 0.75*500:
-                    return('q')
+                    #checkQuit
+                    if 0.25*500 <= menuMouseX <= 0.75*500 and 0.6*500 <= menuMouseY <= 0.75*500:
+                        return('q')
+
+            #Check submenus
+                #Check Save Menu
+                if saveMenuOpen:
+                    #CheckSaveAs
+                    if 0.25*500 <= menuMouseX <= 0.75*500 and 0.4*500 <= menuMouseY <= .55*500:
+                        print('File Saved')
+
+                    #checkBack
+                    if 0.25*500 <= menuMouseX <= 0.75*500 and 0.6*500 <= menuMouseY <= 0.75*500:
+                        menu.closeSave()
+                        saveMenuOpen = False
+                        menuOpen = True
 
         if key_states['q'] == 1:
             print('ConvetionalExit')
